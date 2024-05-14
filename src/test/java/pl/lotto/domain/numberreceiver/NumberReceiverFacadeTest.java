@@ -1,9 +1,13 @@
 package pl.lotto.domain.numberreceiver;
 
 import org.junit.jupiter.api.Test;
+import pl.lotto.domain.AdjustableClock;
 import pl.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -13,10 +17,15 @@ class NumberReceiverFacadeTest {
 
     NumberValidator validator = new NumberValidator();
     InMemoryNumberReceiverRepositoryTestImpl repository = new InMemoryNumberReceiverRepositoryTestImpl();
+    AdjustableClock clock = new AdjustableClock(
+            LocalDateTime.of(2024, 5, 14, 11, 0, 0)
+                    .toInstant(ZoneOffset.UTC), ZoneId.systemDefault());
     NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
             validator,
-            repository
-            );
+            repository,
+            clock
+    );
+
     @Test
     public void should_return_success_when_user_gave_six_numbers() {
         // given
@@ -70,9 +79,10 @@ class NumberReceiverFacadeTest {
         // given
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
-        LocalDateTime drawDate = LocalDateTime.now();
+        LocalDateTime drawDate = LocalDateTime.of(2024, 5, 14, 13, 0, 0);
 
         // when
+        clock.advanceInTimeBy(Duration.ofDays(5));
         List<TicketDto> ticketDtos = numberReceiverFacade.userNumbers(drawDate);
 
         // then

@@ -3,6 +3,7 @@ package pl.lotto.domain.numberreceiver;
 import lombok.AllArgsConstructor;
 import pl.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -14,12 +15,13 @@ public class NumberReceiverFacade {
 
     private final NumberValidator validator;
     private final NumberReceiverRepository repository;
+    private final Clock clock;
 
     public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser){
         boolean areAllNumbersInRange = validator.areAllNumbersInRange(numbersFromUser);
         if (areAllNumbersInRange) {
             String ticketId = UUID.randomUUID().toString();
-            LocalDateTime drawDate = LocalDateTime.now();
+            LocalDateTime drawDate = LocalDateTime.now(clock);
             Ticket savedTicket = repository.save(new Ticket(ticketId, drawDate, numbersFromUser));
             return InputNumberResultDto.builder()
                     .message("success")
