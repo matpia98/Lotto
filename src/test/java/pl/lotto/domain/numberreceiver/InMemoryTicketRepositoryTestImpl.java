@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-class InMemoryNumberReceiverRepositoryTestImpl implements NumberReceiverRepository {
+class InMemoryTicketRepositoryTestImpl implements TicketRepository {
     Map<String, Ticket> inMemoryDatabase = new ConcurrentHashMap<>();
     @Override
     public Ticket save(Ticket ticket) {
