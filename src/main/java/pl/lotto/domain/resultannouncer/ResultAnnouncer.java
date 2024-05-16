@@ -1,4 +1,0 @@
-package pl.lotto.domain.resultannouncer;
-
-public class ResultAnnouncer {
-}
