@@ -53,8 +53,12 @@ public class NumberReceiverFacade {
                 .collect(Collectors.toList());
     }
 
+    public List<TicketDto> retrieveAllTicketsByNextDrawDate() {
+        LocalDateTime nextDrawDate = drawDateGenerator.getNextDrawDate();
+        return retrieveAllTicketsByNextDrawDate(nextDrawDate);
+    }
 
-    List<TicketDto> retrieveAllTicketsByNextDrawDate(LocalDateTime date) {
+    public List<TicketDto> retrieveAllTicketsByNextDrawDate(LocalDateTime date) {
         LocalDateTime nextDrawDate = retrieveNextDrawDate();
         if (date.isAfter(nextDrawDate)) {
             return Collections.emptyList();
