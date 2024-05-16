@@ -153,6 +153,21 @@ class NumberReceiverFacadeTest {
     }
 
     @Test
+    public void should_return_correct_draw_date_by_retrieve() {
+        // given
+        HashGenerable hashGenerator = new HashGenerator();
+        Clock fixedClock = Clock.fixed(LocalDateTime.of( 2024, 5, 14, 10, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.of("Europe/Warsaw"));
+        NumberReceiverFacade numberReceiverFacade = NumberReceiverFacadeConfiguration.createConfigurationForTest(hashGenerator, fixedClock, ticketRepository);
+
+        // when
+        LocalDateTime drawDate = numberReceiverFacade.retrieveNextDrawDate();
+
+        // then
+        LocalDateTime expectedDrawDate = LocalDateTime.of(2024, 5, 18, 12, 0, 0);
+        assertThat(drawDate).isEqualTo(expectedDrawDate);
+    }
+
+    @Test
     public void it_should_return_next_Saturday_draw_date_when_date_is_Saturday_noon() {
         // given
         HashGenerable hashGenerator = new HashGenerator();
