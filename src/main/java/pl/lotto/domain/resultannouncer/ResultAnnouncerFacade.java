@@ -37,7 +37,8 @@ public class ResultAnnouncerFacade {
             return new ResultAnnouncerResponseDto(null, HASH_DOES_NOT_EXIST_MESSAGE.info);
         }
         ResponseDto responseDto = buildResponseDto(resultDto);
-        responseRepository.save(buildResponse(responseDto));
+        ResultResponse resultResponse = buildResponse(responseDto);
+        responseRepository.save(resultResponse);
         if (responseRepository.existsById(hash) && !isAfterResultAnnouncementTime(resultDto)) {
             return new ResultAnnouncerResponseDto(responseDto, WAIT_MESSAGE.info);
         }
