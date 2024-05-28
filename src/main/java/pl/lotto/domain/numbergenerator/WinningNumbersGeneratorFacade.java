@@ -23,18 +23,19 @@ public class WinningNumbersGeneratorFacade {
         );
         Set<Integer> winningNumbers = dto.numbers();
         winningNumberValidator.validate(winningNumbers);
-//        winningNumbersRepository.save(WinningNumbers.builder()
-//                .winningNumbers(winningNumbers)
-//                .date(LocalDateTime.now())
-//                .build());
-        return WinningNumbersDto.builder()
+        WinningNumbers winningNumbersDocument = WinningNumbers.builder()
                 .winningNumbers(winningNumbers)
                 .date(nextDrawDate)
+                .build();
+        WinningNumbers saved = winningNumbersRepository.save(winningNumbersDocument);
+        return WinningNumbersDto.builder()
+                .winningNumbers(saved.winningNumbers())
+                .date(saved.date())
                 .build();
     }
 
     public WinningNumbersDto retrieveWinningNumbersByDate(LocalDateTime date) {
-        WinningNumbers numbersByDate = winningNumbersRepository.findNumbersByDate(date)
+        WinningNumbers numbersByDate = winningNumbersRepository.findFirstByDate(date)
                 .orElseThrow(() -> new WinningNumbersNotFoundException("Not Found"));
         return WinningNumbersDto.builder()
                 .winningNumbers(numbersByDate.winningNumbers())
