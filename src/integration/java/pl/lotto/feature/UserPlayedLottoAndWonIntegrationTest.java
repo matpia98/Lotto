@@ -4,16 +4,23 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.lotto.BaseIntegrationTest;
 import pl.lotto.domain.numbergenerator.WinningNumbersGeneratorFacade;
 import pl.lotto.domain.numbergenerator.WinningNumbersNotFoundException;
+import pl.lotto.domain.numberreceiver.dto.NumberReceiverResponseDto;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
@@ -42,7 +49,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         LocalDateTime drawDate = LocalDateTime.of(2024, 6, 1, 12, 0, 0);
         // when, then
         await()
-                .atMost(Duration.ofSeconds(20))
+                .atMost(Duration.ofSeconds(5))
                 .pollInterval(Duration.ofSeconds(1))
                 .until(() -> {
                     try {
@@ -54,13 +61,24 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         // step 3: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:19.11.2022 12:00 (Saturday), TicketId: sampleTicketId)
         // given
         // when
-//        mockMvc.perform(post("/inputNumbers"))
+        ResultActions perform = mockMvc.perform(post("/inputNumbers")
+                .content("""
+                        {
+                        "inputNumbers": [1,2,3,4,5,6]
+                        }
+                        """
+                ).contentType(MediaType.APPLICATION_JSON));
         // then
+        MvcResult mvcResult = perform.andExpect(status().isOk()).andReturn();
+        String json = mvcResult.getResponse().getContentAsString();
+        NumberReceiverResponseDto numberReceiverResponseDto = objectMapper.readValue(json, NumberReceiverResponseDto.class);
+        assertAll(
+                () -> assertThat(numberReceiverResponseDto.ticketDto().drawDate()).isEqualTo(drawDate),
+                () ->assertThat(numberReceiverResponseDto.ticketDto().ticketId()).isNotNull(),
+                () ->assertThat(numberReceiverResponseDto.messages()).containsOnly("success")
+        );
+
     }
-
-
-
-
 
 
     // step 4: 3 days and 1 minute passed, and it is 1 minute after the draw date (19.11.2022 12:01)

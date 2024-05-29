@@ -2,7 +2,6 @@ package pl.lotto.domain.numberreceiver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,10 +10,11 @@ class NumberValidator {
     private static final int QUANTITY_OF_NUMBERS_FROM_USER = 6;
     private static final int MINIMAL_NUMBER_FROM_USER = 1;
     private static final int MAXIMAL_NUMBER_FROM_USER = 99;
-    List<ValidationResult> errors = new ArrayList<>();
+    List<ValidationResult> errors;
 
 
     List<ValidationResult> validate(Set<Integer> numbersFromUser) {
+        errors = new ArrayList<>();
         if (!isNumberSizeEqualsSix(numbersFromUser)) {
             errors.add(new ValidationResult("YOU MUST GIVE SIX NUMBERS"));
         }
@@ -32,7 +32,7 @@ class NumberValidator {
     }
 
     private boolean isNumberSizeEqualsSix(Set<Integer> numbersFromUser) {
-        return numbersFromUser.size() == 6;
+        return numbersFromUser.size() == QUANTITY_OF_NUMBERS_FROM_USER;
     }
 
     boolean areAllNumbersInRange(Set<Integer> numbersFromUser) {
