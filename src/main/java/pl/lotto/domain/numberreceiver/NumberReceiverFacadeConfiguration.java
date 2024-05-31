@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Configuration
 public class NumberReceiverFacadeConfiguration {
@@ -21,20 +19,20 @@ public class NumberReceiverFacadeConfiguration {
         return new HashGenerator();
     }
 
-    @Bean
-    TicketRepository ticketRepository() {
-        return new TicketRepository() {
-            @Override
-            public Ticket save(Ticket ticket) {
-                return null;
-            }
-
-            @Override
-            public List<Ticket> findAllTicketsByDrawDate(LocalDateTime date) {
-                return null;
-            }
-        };
-    }
+//    @Bean
+//    TicketRepository ticketRepository() {
+//        return new TicketRepository() {
+//            @Override
+//            public Ticket save(Ticket ticket) {
+//                return null;
+//            }
+//
+//            @Override
+//            public List<Ticket> findAllByDrawDate(LocalDateTime drawDate) {
+//                return null;
+//            }
+//        };
+//    }
 
     @Bean
     NumberReceiverFacade numberReceiverFacade(HashGenerable hashGenerator, @Qualifier("clock") Clock clock, TicketRepository ticketRepository) {

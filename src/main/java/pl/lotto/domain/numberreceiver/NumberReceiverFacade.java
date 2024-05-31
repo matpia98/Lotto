@@ -26,12 +26,11 @@ public class NumberReceiverFacade {
         }
         LocalDateTime nextDrawDate = drawDateGenerator.getNextDrawDate();
         String hash = hashGenerator.getHash();
-        Ticket savedTicket = Ticket.builder()
+        Ticket savedTicket = ticketRepository.save(Ticket.builder()
                 .ticketId(hash)
                 .drawDate(nextDrawDate)
                 .numbersFromUser(numbersFromUser)
-                .build();
-        ticketRepository.save(savedTicket);
+                .build());
 
         TicketDto ticketDto = TicketDto.builder()
                 .ticketId(savedTicket.ticketId())
@@ -47,7 +46,7 @@ public class NumberReceiverFacade {
     }
 
     public List<TicketDto> userNumbers(LocalDateTime date) {
-        List<Ticket> allTicketsByDrawDate = ticketRepository.findAllTicketsByDrawDate(date);
+        List<Ticket> allTicketsByDrawDate = ticketRepository.findAllByDrawDate(date);
         return allTicketsByDrawDate.stream()
                 .map(TicketMapper::mapFromTicket)
                 .collect(Collectors.toList());
@@ -63,7 +62,7 @@ public class NumberReceiverFacade {
         if (date.isAfter(nextDrawDate)) {
             return Collections.emptyList();
         }
-        return ticketRepository.findAllTicketsByDrawDate(date)
+        return ticketRepository.findAllByDrawDate(date)
                 .stream()
                 .filter(ticket -> ticket.drawDate().equals(date))
                 .map(ticket -> TicketDto.builder()

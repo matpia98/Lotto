@@ -19,7 +19,9 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
@@ -61,7 +63,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         // step 3: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:19.11.2022 12:00 (Saturday), TicketId: sampleTicketId)
         // given
         // when
-        ResultActions perform = mockMvc.perform(post("/inputNumbers")
+        ResultActions performPostInputNumbers = mockMvc.perform(post("/inputNumbers")
                 .content("""
                         {
                         "inputNumbers": [1,2,3,4,5,6]
@@ -69,22 +71,38 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                         """
                 ).contentType(MediaType.APPLICATION_JSON));
         // then
-        MvcResult mvcResult = perform.andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = performPostInputNumbers.andExpect(status().isOk()).andReturn();
         String json = mvcResult.getResponse().getContentAsString();
         NumberReceiverResponseDto numberReceiverResponseDto = objectMapper.readValue(json, NumberReceiverResponseDto.class);
         assertAll(
                 () -> assertThat(numberReceiverResponseDto.ticketDto().drawDate()).isEqualTo(drawDate),
-                () ->assertThat(numberReceiverResponseDto.ticketDto().ticketId()).isNotNull(),
-                () ->assertThat(numberReceiverResponseDto.messages()).containsOnly("success")
+                () -> assertThat(numberReceiverResponseDto.ticketDto().ticketId()).isNotNull(),
+                () -> assertThat(numberReceiverResponseDto.messages()).containsOnly("success")
         );
+
+        // step 4: user made GET /results/notExistingId and system returned 404(NOT_FOUND) and body with (message: Not found for id: notExistingId and status NOT_FOUND)
+        // given
+
+        // when
+        ResultActions performGetResultsWithNotExistingId = mockMvc.perform(get("/results/" + "notExistingId"));
+        // then
+        performGetResultsWithNotExistingId.andExpect(status().isNotFound())
+                .andExpect(content().json(
+                        """
+                                {
+                                "message": "Not found for id: notExistingId",
+                                "status": "NOT_FOUND"
+                                }
+                                """.trim()
+                ));
+        // step 5: 3 days and 1 minute passed, and it is 1 minute after the draw date (19.11.2022 12:01)
+        // step 6: system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
+        // step 7: 3 hours passed, and it is 1 minute after announcement time (19.11.2022 15:01)
+        // step 8: user made GET /results/sampleTicketId and system returned 200 (OK)
 
     }
 
 
-    // step 4: 3 days and 1 minute passed, and it is 1 minute after the draw date (19.11.2022 12:01)
-    // step 5: system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
-    // step 6: 3 hours passed, and it is 1 minute after announcement time (19.11.2022 15:01)
-    // step 7: user made GET /results/sampleTicketId and system returned 200 (OK)
 }
 
 
