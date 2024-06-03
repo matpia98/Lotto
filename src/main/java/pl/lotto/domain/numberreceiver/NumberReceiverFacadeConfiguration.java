@@ -35,7 +35,7 @@ public class NumberReceiverFacadeConfiguration {
 //    }
 
     @Bean
-    NumberReceiverFacade numberReceiverFacade(HashGenerable hashGenerator, @Qualifier("clock") Clock clock, TicketRepository ticketRepository) {
+    NumberReceiverFacade numberReceiverFacade(HashGenerable hashGenerator, Clock clock, TicketRepository ticketRepository) {
         NumberValidator numberValidator = new NumberValidator();
         DrawDateGenerator drawDateGenerator = new DrawDateGenerator(clock);
         return new NumberReceiverFacade(numberValidator, drawDateGenerator, hashGenerator, ticketRepository);

@@ -15,7 +15,7 @@ public class ResultAnnouncerRestController {
     private final ResultAnnouncerFacade resultAnnouncerFacade;
 
 
-    @GetMapping("results/{ticketId}")
+    @GetMapping("/results/{ticketId}")
     public ResponseEntity<ResultAnnouncerResponseDto> checkResultsById(@PathVariable String ticketId) {
         ResultAnnouncerResponseDto responseDto = resultAnnouncerFacade.checkResult(ticketId);
         return ResponseEntity.ok(responseDto);

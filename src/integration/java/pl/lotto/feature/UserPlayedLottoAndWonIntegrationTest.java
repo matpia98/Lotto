@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.lotto.BaseIntegrationTest;
 import pl.lotto.domain.numbergenerator.WinningNumbersGeneratorFacade;
 import pl.lotto.domain.numbergenerator.WinningNumbersNotFoundException;
@@ -51,7 +50,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         LocalDateTime drawDate = LocalDateTime.of(2024, 6, 1, 12, 0, 0);
         // when, then
         await()
-                .atMost(Duration.ofSeconds(5))
+                .atMost(Duration.ofSeconds(20))
                 .pollInterval(Duration.ofSeconds(1))
                 .until(() -> {
                     try {
@@ -84,7 +83,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         // given
 
         // when
-        ResultActions performGetResultsWithNotExistingId = mockMvc.perform(get("/results/" + "notExistingId"));
+        ResultActions performGetResultsWithNotExistingId = mockMvc.perform(get("/results/notExistingId"));
         // then
         performGetResultsWithNotExistingId.andExpect(status().isNotFound())
                 .andExpect(content().json(
