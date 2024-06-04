@@ -33,7 +33,12 @@ public class PlayerRepositoryTestImpl implements PlayerRepository {
     }
 
     @Override
-    public Optional<Player> findById(String hash) {
+    public Optional<Player> findById(String s) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Player> findByHash(String hash) {
         return Optional.ofNullable(playersList.get(hash));
     }
 
