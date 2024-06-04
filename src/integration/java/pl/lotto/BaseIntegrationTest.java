@@ -14,6 +14,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import pl.lotto.domain.AdjustableClock;
 
 import java.time.Clock;
 
@@ -34,7 +35,7 @@ public class BaseIntegrationTest {
     public ObjectMapper objectMapper;
 
     @Autowired
-    public Clock clock;
+    public AdjustableClock clock;
     @Container
     public static final MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"));
 
