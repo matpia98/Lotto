@@ -15,7 +15,7 @@ public class RestTemplateResponseErrorHandler extends DefaultResponseErrorHandle
 
     @Override
     public void handleError(ClientHttpResponse httpResponse) throws IOException {
-        final HttpStatus statusCode = (HttpStatus) httpResponse.getStatusCode();
+        final HttpStatus statusCode = HttpStatus.valueOf(httpResponse.getStatusCode().value());
         final Series series = statusCode.series();
         if (series == SERVER_ERROR) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while using http client");

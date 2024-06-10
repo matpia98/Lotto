@@ -1,6 +1,5 @@
 package pl.lotto.infrastructure.numbergenerator.http;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,9 +10,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 import pl.lotto.domain.numbergenerator.RandomNumberGenerable;
 import pl.lotto.domain.numbergenerator.SixRandomNumbersDto;
@@ -36,8 +37,7 @@ public class RandomNumberGeneratorRestTemplate implements RandomNumberGenerable 
         final HttpEntity<HttpHeaders> requestEntity = new HttpEntity<>(headers);
         try {
             final ResponseEntity<List<Integer>> response = makeGetRequest(count, lowerBand, upperBand, requestEntity);
-            List<Integer> body = response.getBody();
-            Set<Integer> sixDistinctNumbers = getSixRandomDistinctNumbers(body);
+            Set<Integer> sixDistinctNumbers = getSixRandomDistinctNumbers(response);
             if (sixDistinctNumbers.size() != MAXIMAL_WINNING_NUMBERS) {
                 log.error("Set is less than: {} Have to request one more time", count);
                 return generateSixRandomNumbers(count, lowerBand, upperBand);
@@ -47,7 +47,10 @@ public class RandomNumberGeneratorRestTemplate implements RandomNumberGenerable 
                     .build();
         } catch (ResourceAccessException e) {
             log.error("Error while fetching winning numbers using http client: " + e.getMessage());
-            return SixRandomNumbersDto.builder().build();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getClass().getSimpleName() + ": " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -66,12 +69,13 @@ public class RandomNumberGeneratorRestTemplate implements RandomNumberGenerable 
         return response;
     }
 
-    private Set<Integer> getSixRandomDistinctNumbers(List<Integer> numbers) {
+    private Set<Integer> getSixRandomDistinctNumbers(ResponseEntity<List<Integer>> response) {
+        List<Integer> numbers = response.getBody();
         if (numbers == null) {
             log.error("Response Body was null returning empty collection");
-            return Collections.emptySet();
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
         }
-        log.info("Success Response Body Returned: " + numbers);
+        log.info("Success Response Body Returned: " + response);
         Set<Integer> distinctNumbers = new HashSet<>(numbers);
         return distinctNumbers.stream()
                 .limit(6)
