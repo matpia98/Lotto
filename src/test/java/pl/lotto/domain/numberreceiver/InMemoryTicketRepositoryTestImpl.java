@@ -32,6 +32,11 @@ class InMemoryTicketRepositoryTestImpl implements TicketRepository {
     }
 
     @Override
+    public Optional<Ticket> findByTicketId(String ticketId) {
+        return Optional.empty();
+    }
+
+    @Override
     public <S extends Ticket> S insert(S entity) {
         return null;
     }

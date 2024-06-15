@@ -1,6 +1,7 @@
 package pl.lotto.domain.numberreceiver;
 
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import pl.lotto.domain.numberreceiver.dto.NumberReceiverResponseDto;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
 
@@ -71,5 +72,12 @@ public class NumberReceiverFacade {
                         .numbersFromUser(ticket.numbersFromUser())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Cacheable("ticketRepository")
+    public TicketDto retrieveTicketByTicketId(String ticketId) {
+        Ticket ticketById = ticketRepository.findByTicketId(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket with id: " + ticketId + " not found"));
+        return TicketMapper.mapFromTicket(ticketById);
     }
 }

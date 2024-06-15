@@ -8,7 +8,6 @@ import pl.lotto.domain.resultchecker.dto.ResultDto;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Optional;
 
 import static pl.lotto.domain.resultannouncer.MessageResponse.ALREADY_CHECKED;
